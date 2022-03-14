@@ -12,8 +12,8 @@ namespace test.Service
   
         void UpdateEmployee(Employee employee);  
   
-        void DeleteEmployee(int Id);  
+        void DeleteEmployee(int id);  
   
-        Employee GetEmployee(int Id);  
+        Employee GetEmployee(int id);  
     }  
 }

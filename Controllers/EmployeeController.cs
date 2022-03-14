@@ -14,126 +14,107 @@ namespace test.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private MyDBContext myDbContext;  
-  
-        public EmployeeController(MyDBContext context)  
-        {  
-            myDbContext = context;  
-        }  
-  
-        [HttpGet]  
-        public IList<Employee> Get()
-        {
-            return (this.myDbContext.Employees.AsNoTracking().ToList());
-            
-        }  
-        
-        [HttpGet("{id}")]
-        public List<Employee> GetbyId(int id)
-        {
-            return new List<Employee>()
-            {
-                myDbContext.Employees.FirstOrDefault(x => x.id == id)
-            };
-            
-        }  
-        
-        [HttpPost]  
-        public IList<Employee> Post([FromBody] Employee param)
-        {
-            myDbContext.Employees.Add(param);
-            myDbContext.SaveChanges();
-            
-            return (this.myDbContext.Employees.AsNoTracking().ToList());
-            
-        } 
+        // private MyDBContext myDbContext;  
+        //
+        // public EmployeeController(MyDBContext context)  
+        // {  
+        //     myDbContext = context;  
+        // }  
+        private readonly EmployeeContext _context;
 
-        [HttpPut("{id}")]
-        public IList<Employee> Update(int id, [FromBody] Employee param)
+        public EmployeeController(EmployeeContext context)
         {
-            myDbContext.Entry(param).State = EntityState.Modified;  
-            myDbContext.SaveChanges();
-            // myDbContext.Entry(await myDbContext.Employees.FirstOrDefaultAsync(x => x.id == param.id)).CurrentValues.SetValues(param);
-            return (this.myDbContext.Employees.AsNoTracking().ToList());
+            _context = context;
         }
         
-        // [HttpDelete("{id}")]
-        // public IList<Employee> Delete(int id)
-        // {
-        //     if (id <= 0)
-        //         return BadRequest("id Tidak Valid");
-        //
-        //     using (var ctx = myDbContext)
-        //     {
-        //         var employee = ctx.Employees
-        //             .FirstOrDefault(x => x.id == id);
-        //
-        //         ctx.Entry(employee).State = 
-        //             System.Data..EntityState.Deleted;
-        //         ctx.SaveChanges();
-        //     }
-        //     
-        //     return (this.myDbContext.Employees.AsNoTracking().ToList());
-        //
-        // }
-        
-        
-        
-        // // PUT: api/Employee/5
-        // [HttpPut("{id}")]
-        // public List<Employee> Put(int id, [FromBody] Employee param)
-        // {
-        
-        //     myDbContext.Employees.Add(param);
-        //     myDbContext.SaveChanges();
-        //     return (this.myDbContext.Employees.AsNoTracking().ToList());
-        // }
-        
-        
-        
-        // [HttpDelete]
-        // public IList<Employee> Delete([FromBody] Employee param)
-        // {
-        //     // [HttpDelete]
-        //     // public async Task<IActionResult> Delete([FromBody]EntityViewModel vm)
-        //     // {
-        //     myDbContext.Employees.FirstOrDefault().
-        //     myDbContext.SaveChanges();
-            
-        //     return (this.myDbContext.Employees.AsNoTracking().ToList());
+        [HttpGet]  
+        public async Task<ActionResult<ResponseDto>> GetEmployee()
+        {
+            var data =  await _context.Employees
+                .AsNoTracking().ToListAsync();
 
-        // }
+            return new ResponseDto()
+            {
+                Status = true,
+                Message = "Sukses",
+                Data = data
+            };
+        }
         
-        // // GET: api/Employee
-        // [HttpGet]
-        // public IEnumerable<string> Get()
-        // {
-        //     return new string[] { "value1", "value2" };
-        // }
-        //
-        // // GET: api/Employee/5
-        // [HttpGet("{id}", Name = "Get")]
-        // public string Get(int id)
-        // {
-        //     return "value";
-        // }
-        //
-        // // POST: api/Employee
-        // [HttpPost]
-        // public void Post([FromBody] string value)
-        // {
-        // }
-        //
-        // // PUT: api/Employee/5
-        // [HttpPut("{id}")]
-        // public void Put(int id, [FromBody] string value)
-        // {
-        // }
-        //
-        // // DELETE: api/ApiWithActions/5
-        // [HttpDelete("{id}")]
-        // public void Delete(int id)
-        // {
-        // }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Employee>> GetbyId(int id)
+        {
+            var getDataEmployee = await _context.Employees.FindAsync(id);
+
+            if (getDataEmployee == null)
+            {
+                return NotFound();
+            }
+
+            return getDataEmployee;
+        }
+        
+        [HttpPost]
+        public async Task<List<Employee>> CreateTodoItem(Employee param)
+        {
+            var dataEmployee = new Employee
+            {
+                Nama = param.Nama,
+                Alamat = param.Alamat
+            };
+
+            _context.Employees.Add(dataEmployee);
+            await _context.SaveChangesAsync();
+            
+            return (this._context.Employees.AsNoTracking().ToList());
+        }
+        
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Employee>> Put(int id, Employee param)
+        {
+            if (id != param.Id)
+            {
+                return BadRequest();
+            }
+
+            var dataEmployee = await _context.Employees.FindAsync(id);
+            if (dataEmployee == null)
+            {
+                return NotFound();
+            }
+
+            dataEmployee.Nama = param.Nama;
+            dataEmployee.Alamat = param.Alamat;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException) when (!EmployeeExists(id))
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var dataEmployee = await _context.Employees.FindAsync(id);
+
+            if (dataEmployee == null)
+            {
+                return NotFound();
+            }
+
+            _context.Employees.Remove(dataEmployee);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        
+        private bool EmployeeExists(int id) =>
+            _context.Employees.Any(e => e.Id == id);
     }
 }
