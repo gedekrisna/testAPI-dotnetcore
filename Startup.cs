@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using test.Data;
+using test.Models;
 
 namespace test
 {
@@ -45,7 +46,8 @@ namespace test
             });
             
             string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");  
-            services.AddDbContextPool<MyDBContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr))); 
+            services.AddDbContext<EmployeeContext>(opt => opt.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr))); 
+            services.AddDbContextPool<MyDbContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr))); 
             
             // services.AddControllers()
             //     .AddJsonOptions(options => 

@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace test.Data
 {
-    public class MyDBContext : DbContext
+    public class MyDbContext : DbContext
     {
         public DbSet<Employee> Employees { get; set; }
 
-        public MyDBContext(DbContextOptions<MyDBContext> options) : base(options)
+        public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
         }
 

@@ -7,41 +7,41 @@ namespace test.Service
 {  
     public class EmployeeService : IEmployeeService  
     {  
-        public MyDBContext _employeeDbContext;  
-        public EmployeeService(MyDBContext employeeDbContext)  
+        public MyDbContext EmployeeDbContext;  
+        public EmployeeService(MyDbContext employeeDbContext)  
         {  
-            _employeeDbContext = employeeDbContext;  
+            EmployeeDbContext = employeeDbContext;  
         }  
         public Employee AddEmployee(Employee employee)  
         {  
-            _employeeDbContext.Employees.Add(employee);  
-            _employeeDbContext.SaveChanges();  
+            EmployeeDbContext.Employees.Add(employee);  
+            EmployeeDbContext.SaveChanges();  
             return employee;  
         }  
         public List<Employee> GetEmployees()  
         {  
-            return _employeeDbContext.Employees.ToList();  
+            return EmployeeDbContext.Employees.ToList();  
         }  
   
         public void UpdateEmployee(Employee employee)  
         {  
-            _employeeDbContext.Employees.Update(employee);  
-            _employeeDbContext.SaveChanges();  
+            EmployeeDbContext.Employees.Update(employee);  
+            EmployeeDbContext.SaveChanges();  
         }  
   
-        public void DeleteEmployee(int Id)
+        public void DeleteEmployee(int id)
         {
-            var employee = _employeeDbContext.Employees.FirstOrDefault(x => x.id == Id);
+            var employee = EmployeeDbContext.Employees.FirstOrDefault(x => x.Id == id);
             if (employee != null)  
             {  
-                _employeeDbContext.Remove(employee);  
-                _employeeDbContext.SaveChanges();  
+                EmployeeDbContext.Remove(employee);  
+                EmployeeDbContext.SaveChanges();  
             }  
         }  
   
-        public Employee GetEmployee(int Id)  
+        public Employee GetEmployee(int id)  
         {  
-            return _employeeDbContext.Employees.FirstOrDefault(x => x.id == Id);  
+            return EmployeeDbContext.Employees.FirstOrDefault(x => x.Id == id);  
         }  
   
     }  
